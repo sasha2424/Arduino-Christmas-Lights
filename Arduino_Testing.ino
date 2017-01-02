@@ -1,3 +1,13 @@
+/*
+ * Author:
+ * Alexander Ivanov
+ * 
+ * Christmas Lights Project Requirements:
+ * - Arduino
+ * - 4 relays connected to sockets
+ * - optional liquid crystal display
+ */
+
 
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h> // -optional-
