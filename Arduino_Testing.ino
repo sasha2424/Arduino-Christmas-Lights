@@ -2,10 +2,6 @@
  * Author:
  * Alexander Ivanov
  * 
- * Christmas Lights Project Requirements:
- * - Arduino
- * - 4 relays connected to sockets
- * - optional liquid crystal display
  */
 
 
@@ -18,12 +14,13 @@ LiquidCrystal_I2C lcd(0x3F,20,4);    // 0x27 // -optional-
 unsigned long onTime = 10800000; //3 hours
 unsigned long SCALE = 1; // by how to speed up time cycle
 
+int pins[] = {28,26,24,22}; // pins where relays are connected
+#define SIZE  (sizeof(pins)/sizeof(int)) // set constant for number of relays
+
+int states[SIZE]; // states of individual sockets High = OFF Low = ON
 
 int patternTimer = 0; // timer for pattern transitions
-int patternRates[] = {random(2,20),random(2,20),random(2,20),random(2,20)};
-
-int pins[] = {28,26,24,22}; // pins where relays are connected
-int states[] = {LOW,LOW,LOW,LOW}; // states of individual sockets High = OFF Low = ON
+int patternRates[SIZE];
 
 int Timer = 0; // timer for heartbeat light
 int ledState = LOW; // state of heartbeat light
@@ -36,8 +33,10 @@ void setup()
   
   pinMode(led,OUTPUT); // set pin modes for heartbeat
 
-  for(int i = 0; i < 4; i++){
-    pinMode(pins[i],OUTPUT);
+  for(int i = 0; i < SIZE; i++){
+    pinMode(pins[i],OUTPUT); // set output type for relay pins
+    states[i] = LOW; // set initial relay states to all on
+    patternRates[i] = random(2,20); // set pattern constants
   }
   
 }
@@ -53,12 +52,12 @@ void loop() {
   
   if(millis()%(86400000 / SCALE) < onTime/SCALE){
     // turn on relays acording to states
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < SIZE; i++){
       digitalWrite(pins[i],states[i]); // set relay out puts to current out put
     }
     
     patternTimer ++;
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < SIZE; i++){
       if(patternTimer % patternRates[i] == 0){
         states[i] = (LOW + HIGH) - states[i]; // switches relay states
       }
@@ -69,7 +68,7 @@ void loop() {
   
   } else {
     // turn all of
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < SIZE; i++){
       digitalWrite(pins[i],HIGH); // turn off all relays
     }
 
